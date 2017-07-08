@@ -1,3 +1,15 @@
+
+BOX=$HOME/box
+CODE=$HOME/code
+CODE_EXT=$CODE/ext
+CODE_BEN=$CODE/ben
+DOTFILES=$CODE_BEN/dotfiles
+ORG=$HOME/org
+
+mkdir -p $BOX
+mkdir -p $CODE_BEN
+mkdir -p $CODE_EXT
+
 echo "Adding PPA for latest emacs"
 sudo add-apt-repository ppa:kelleyk/emacs
 
@@ -37,6 +49,43 @@ sudo apt install -y \
      xterm \
      zsh
 
+echo "Adding $USER to docker group"
+sudo adduser $USER docker
+
+echo "Installing Oh-my-zsh"
+wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh
+chsh -s `which zsh`
+
+echo "Setting up Box.com WebDAV"
+sudo sed -i 's/# use_locks       1/use_locks        0/' /etc/davfs2/davfs2.conf
+sudo dpkg-reconfigure -fnoninteractive davfs2
+sudo usermod -a -G davfs2 $USER
+sudo echo "https://dav.box.com/dav $HOME/box davfs rw,user,noauto 0 0" >> /etc/fstab
+
+echo "Mounting $HOME/box"
+mount $BOX
+echo "Symlinking $BOX/org to $ORG/ben"
+ln -s $BOX/org $ORG/ben
+
+echo "Installing dotfiles"
+git clone https://github.com/gmoben/dotfiles.git $DOTFILES
+pushd $DOTFILES
+./install.sh
+popd
+source $HOME/.aliases
+
+echo "Symlinkingsource $HOME/.aliases zsh everywhere"
+sudo ln -s `which zsh` /usr/local/bin/zsh
+mkdir -p $HOME/.local/bin
+sudo ln -s `which zsh` $HOME/.local/bin/zsh
+
+echo "Installing pip packages"
+pip --upgrade pip
+pip install \
+    ipython
+    virtualenv \
+    virtualenvwrapper
+
 echo "Installing i3-gaps dependencies"
 sudo apt install -y \
     xcb-proto \
@@ -55,14 +104,14 @@ sudo apt install -y \
     libxkbcommon-dev \
     libxkbcommon-x11-dev \
     autoconf \
-    libxcb-xrm-dev
+
 sudo add-apt-repository ppa:aguignard/ppa
 sudo apt-get update
 sudo apt-get install libxcb-xrm-dev
 
 echo "Installing i3-gaps"
-mkdir -p $HOME/code/ext
-pushd $HOME/code/ext
+mkdir -p $CODE_EXT
+pushd $CODE_EXT
 git clone https://www.github.com/Airblader/i3 i3-gaps
 pushd i3-gaps
 autoreconf --force --install
@@ -73,46 +122,27 @@ mkdir -p build && cd build/
 make
 sudo make install
 
-echo "Adding $USER to docker group"
-sudo adduser $USER docker
+echo "Installing i3 extras"
 
-echo "Installing Oh-my-zsh"
-wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh
-sudo chsh -s `which zsh`
-chsh -s `which zsh`
+sudo apt install -y \
+     libxcb-xrm-dev \
+     libxcb-ewmh-dev \
+     libjsoncpp-dev \
+     libmpdclient-dev \
+     libasound2-dev \
+     libcurl4-openssl-dev \
+     libiw-dev \
+     wireless-tools \
+     python-xcbgen
 
-echo "Setting up Box.com WebDAV"
-mkdir -p $HOME/box
-sudo sed -i 's/# use_locks       1/use_locks        0/' /etc/davfs2/davfs2.conf
-sudo dpkg-reconfigure -fnoninteractive davfs2
-sudo usermod -a -G davfs2 $USER
-sudo echo "https://dav.box.com/dav $HOME/box davfs rw,user,noauto 0 0" >> /etc/fstab
+export XCB_EWMH_LIBRARY=/usr/lib/x86_64-linux-gnu
+export XCB_EWMH_INCLUDE_DIR=/usr/include/xcb
 
-echo "Mounting $HOME/box"
-mount $HOME/box
-source $HOME/.aliases
-echo "Symlinking org files"
-mkdir $HOME/org
-ln -s $HOME/box/org $HOME/org/ben
-
-echo "Installing dotfiles"
-mkdir -p $HOME/code/ben
-git clone https://github.com/gmoben/dotfiles.git $HOME/code/ben/dotfiles
-pushd $HOME/code/ben/dotfiles
-./install.shmount $HOME/box
-popdgit clone --branch 3.0.5 --recursive https://github.com/jaagr/polybar
-
-echo "Symlinkingsource $HOME/.aliases zsh everywhere"
-sudo ln -s `which zsh` /usr/local/bin/zsh
-mkdir -p $HOME/.mount $HOME/boxlocal/bin
-sudo ln -s `which zsh` $HOME/.local/bin/zsh
-
-# Virtualenv
-pip install virtualenv virtualenvwrapper
+pushd $CODE_EXT
 git clone --branch 3.0.5 --recursive https://github.com/jaagr/polybar
-
-
-source $HOME/.aliases
+cd polybar
+./build.sh
+popd
 
 # If interactive
 if [[ $- == *i* ]]; then
