@@ -103,7 +103,7 @@ sudo apt install -y \
     libxcb-xkb-dev \
     libxkbcommon-dev \
     libxkbcommon-x11-dev \
-    autoconf \
+    autoconf
 
 sudo add-apt-repository ppa:aguignard/ppa
 sudo apt-get update
@@ -133,7 +133,12 @@ sudo apt install -y \
      libcurl4-openssl-dev \
      libiw-dev \
      wireless-tools \
-     python-xcbgen
+     python-xcbgen \
+     compton \
+     pavucontrol \
+     xautolock \
+     scrot \
+     imagemagick
 
 export XCB_EWMH_LIBRARY=/usr/lib/x86_64-linux-gnu
 export XCB_EWMH_INCLUDE_DIR=/usr/include/xcb
