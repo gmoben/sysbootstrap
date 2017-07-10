@@ -103,7 +103,7 @@ sudo apt install -y \
     libxcb-xkb-dev \
     libxkbcommon-dev \
     libxkbcommon-x11-dev \
-    autoconf \
+    autoconf
 
 sudo add-apt-repository ppa:aguignard/ppa
 sudo apt-get update
@@ -133,7 +133,14 @@ sudo apt install -y \
      libcurl4-openssl-dev \
      libiw-dev \
      wireless-tools \
-     python-xcbgen
+     python-xcbgen \
+     compton \
+     pavucontrol \
+     xautolock \
+     scrot \
+     imagemagick \
+     viewnior \
+     conky
 
 export XCB_EWMH_LIBRARY=/usr/lib/x86_64-linux-gnu
 export XCB_EWMH_INCLUDE_DIR=/usr/include/xcb
@@ -143,6 +150,15 @@ git clone --branch 3.0.5 --recursive https://github.com/jaagr/polybar
 cd polybar
 ./build.sh
 popd
+
+PLAYERCTL=/tmp/playerctl
+mkdir -p $PLAYERCTL
+pushd $PLAYERCTL
+wget https://github.com/acrisci/playerctl/releases/download/v0.5.0/playerctl-0.5.0_amd64.deb
+sudo dpkg -i playerctl*.deb
+popd
+rm -rf $PLAYERCTL
+
 
 # If interactive
 if [[ $- == *i* ]]; then
