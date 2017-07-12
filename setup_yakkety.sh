@@ -140,7 +140,8 @@ sudo apt install -y \
      scrot \
      imagemagick \
      viewnior \
-     conky
+     conky \
+     rofi
 
 export XCB_EWMH_LIBRARY=/usr/lib/x86_64-linux-gnu
 export XCB_EWMH_INCLUDE_DIR=/usr/include/xcb
@@ -151,6 +152,7 @@ cd polybar
 ./build.sh
 popd
 
+
 PLAYERCTL=/tmp/playerctl
 mkdir -p $PLAYERCTL
 pushd $PLAYERCTL
@@ -158,6 +160,13 @@ wget https://github.com/acrisci/playerctl/releases/download/v0.5.0/playerctl-0.5
 sudo dpkg -i playerctl*.deb
 popd
 rm -rf $PLAYERCTL
+
+echo "Installing Spotify"
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys BBEBDCB318AD50EC6865090613B00F1FD2C19886
+echo deb http://repository.spotify.com stable non-free | sudo tee /etc/apt/sources.list.d/spotify.list
+sudo apt-get update
+sudo apt-get install spotify-client
+
 
 
 # If interactive
